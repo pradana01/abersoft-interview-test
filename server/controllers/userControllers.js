@@ -15,7 +15,7 @@ class Controller {
             res.status(201).json(data)
         })
         .catch(err => {
-            console.log(err)
+            next({ name: 'SequelizeValidationError' })
         })
     }
 
@@ -33,7 +33,6 @@ class Controller {
             }
         })
         .catch(err => {
-            console.log(err)
             next({ name: 'LoginValidationError' })
         })
     }
