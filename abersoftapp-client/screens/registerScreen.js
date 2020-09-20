@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import {View, Text, StyleSheet, Platform, StatusBar, SafeAreaView } from 'react-native'
+import React, { Component, useEffect } from 'react'
+import {View, Text, StyleSheet, Platform, StatusBar, SafeAreaView, Keyboard } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -15,16 +15,39 @@ const fetchFonts = () => {
   });
 };  
 
-export default function Registerscreen () {
+export default function Registerscreen (props) {
     const [ email, setEmail ] = React.useState('')
     const [ password, setPassword ] = React.useState('')
     const [dataLoaded, setDataLoaded] = React.useState(false)
+    const [togleKeyboard, setTogleKeyboard] = React.useState(false)
+    const navigate = props.navigation.navigate
+
 
     const dispatch = useDispatch()
     const user_register = () => {
         let userData = { email, password }
         dispatch(userRegister(userData))
+        navigate('Login')
     }
+
+    useEffect(() => {
+      Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+      Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+  
+      return () => {
+        Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+        Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+      };
+    }, []);
+  
+
+    const _keyboardDidShow = () => {
+        setTogleKeyboard(true)
+    };
+    
+    const _keyboardDidHide = () => {
+        setTogleKeyboard(false)
+    };
 
     if(!dataLoaded) {
         return (
@@ -34,7 +57,6 @@ export default function Registerscreen () {
           />
         )
     }
-    
 
     return(
         <SafeAreaView style={styles.container}>
@@ -49,7 +71,7 @@ export default function Registerscreen () {
               height: 812,
             }}
           />
-            <View style={styles.card}>
+            <View style={togleKeyboard ? styles.cardTop : styles.cardBottom}>
                 <View style={styles.textContainer}>
                     <Text style={{ fontFamily: 'roboto-bold', fontSize: 23 }}>Register New Account</Text>
                     <TextInput
@@ -79,13 +101,23 @@ const styles = StyleSheet.create({
       flex: 1,
       paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
     },
-    card: {
-        alignItems: 'center',
-        backgroundColor: 'white',
-        borderRadius: 51,
-        height: 475,
-        textAlign: 'left',
-        top: 350
+    cardBottom: {
+      alignItems: 'center',
+      backgroundColor: 'white',
+      borderRadius: 51,
+      height: 475,
+      textAlign: 'left',
+      top: 350,
+      flex: 1,
+    },
+    cardTop: {
+      alignItems: 'center',
+      backgroundColor: 'white',
+      borderRadius: 51,
+      height: 475,
+      textAlign: 'left',
+      top: 180,
+      flex: 1,
     },
     createAccountButton: {
         backgroundColor: 'rgba(53, 73, 251, 1)',

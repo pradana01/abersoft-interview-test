@@ -18,7 +18,7 @@ export function userRegister(data) {
             })
         })
         .catch((err) => {
-            console.log(err)
+            Alert.alert('Register Failed')
         })
     }
 }

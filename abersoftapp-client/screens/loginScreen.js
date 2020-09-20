@@ -1,5 +1,5 @@
 import React, { Component, useEffect } from 'react'
-import {View, Text, StyleSheet, Platform, StatusBar, SafeAreaView, InteractionManager, Alert, KeyboardAvoidingView } from 'react-native'
+import {View, Text, StyleSheet, Platform, StatusBar, SafeAreaView, Alert, Keyboard } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 
@@ -20,6 +20,7 @@ export default function Loginscreen (props) {
     const [ email, setEmail ] = React.useState('')
     const [ password, setPassword ] = React.useState('')
     const [dataLoaded, setDataLoaded] = React.useState(false)
+    const [togleKeyboard, setTogleKeyboard] = React.useState(false)
     const dispatch = useDispatch()
     const navigate = props.navigation.navigate
     const token = useSelector((state) => state.token)
@@ -39,6 +40,26 @@ export default function Loginscreen (props) {
             navigate('Onboarding')
         }
     })
+
+    useEffect(() => {
+        Keyboard.addListener("keyboardDidShow", _keyboardDidShow);
+        Keyboard.addListener("keyboardDidHide", _keyboardDidHide);
+    
+        return () => {
+          Keyboard.removeListener("keyboardDidShow", _keyboardDidShow);
+          Keyboard.removeListener("keyboardDidHide", _keyboardDidHide);
+        };
+    }, []);
+    
+
+    const _keyboardDidShow = () => {
+        setTogleKeyboard(true)
+    };
+    
+    const _keyboardDidHide = () => {
+        setTogleKeyboard(false)
+    };
+    
 
     if(!dataLoaded) {
         return (
@@ -62,10 +83,10 @@ export default function Loginscreen (props) {
                 height: 812,
             }}
           />
-            <KeyboardAvoidingView  behavior={Platform.OS == "ios" ? "padding" : "height"} style={{ flex: 1}}>
-            <View style={styles.card}>
+
+            <View style={togleKeyboard ? styles.cardTop : styles.cardBottom}>
                 <View style={styles.textContainer}>
-                    <Text style={{ fontFamily: 'roboto-bold', fontSize: 23 }}>Login</Text>
+                    <Text style={{ fontFamily: 'roboto-bold', fontSize: 23, flex: 1 }}>Login</Text>
                     <TextInput
                         style={{ borderBottomColor: 'red', borderBottomWidth: 2, width: 267, marginTop: 30 }}
                         onChangeText={text => setEmail(text)} 
@@ -84,8 +105,6 @@ export default function Loginscreen (props) {
                     </TouchableOpacity>
                 </View>
             </View>
-          </KeyboardAvoidingView>
-
         </SafeAreaView>
     )
 }
@@ -94,19 +113,24 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
-    //   alignItems: 'center',
-    //   justifyContent: "flex-end",
     },
-    card: {
+    cardBottom: {
         alignItems: 'center',
         backgroundColor: 'white',
         borderRadius: 51,
         height: 475,
         textAlign: 'left',
         top: 350,
-        // flex: 1,
-        // justifyContent: "flex-end",
-        // padding: 24
+        flex: 1,
+    },
+    cardTop: {
+        alignItems: 'center',
+        backgroundColor: 'white',
+        borderRadius: 51,
+        height: 475,
+        textAlign: 'left',
+        top: 180,
+        flex: 1,
     },
     createAccountButton: {
         backgroundColor: 'rgba(53, 73, 251, 1)',
@@ -117,7 +141,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         position: 'absolute',
-        top: 20,
+        top: 25,
         flex: 1,
         justifyContent: 'flex-end',
         padding: 24
